@@ -49,6 +49,12 @@ typedef enum MTMessageType {
 	MTMessageTypeError					// shows error-mark
 } MTMessageType;
 
+// indicates theme
+typedef enum MTStatusBarOverlayTheme {
+    MTStatusBarOverlayThemeDefault,
+    MTStatusBarOverlayThemeLight,
+    MTStatusBarOverlayThemeDark
+} MTStatusBarOverlayTheme;
 
 // keys used in the dictionary-representation of a status message
 #define kMTStatusBarOverlayMessageKey			@"MessageText"
@@ -114,6 +120,8 @@ typedef enum MTMessageType {
 @property (nonatomic, assign) MTDetailViewMode detailViewMode;
 // the text displayed in the detailView (alternative to history)
 @property (nonatomic, copy) NSString *detailText;
+// the theme of the status bar (inferred UIStatusBarType by default)
+@property (nonatomic, assign) MTStatusBarOverlayTheme theme;
 // the delegate of the overlay
 @property (nonatomic, unsafe_unretained) id<MTStatusBarOverlayDelegate> delegate;
 @property(nonatomic, strong) UIColor *customTextColor;

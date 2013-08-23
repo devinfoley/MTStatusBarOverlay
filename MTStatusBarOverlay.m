@@ -72,6 +72,7 @@ MAX([UIApplication sharedApplication].statusBarFrame.size.width, [UIApplication 
 #define kLightThemeDetailViewBackgroundColor		[UIColor blackColor]
 #define kLightThemeDetailViewBorderColor			[UIColor darkGrayColor]
 #define kLightThemeHistoryTextColor					[UIColor colorWithRed:0.749f green:0.749f blue:0.749f alpha:1.0f]
+#define kLightThemeStatusBarBackgroundImageViewBackgroundColor [UIColor clearColor]
 
 
 ///////////////////////////////////////////////////////
@@ -85,6 +86,7 @@ MAX([UIApplication sharedApplication].statusBarFrame.size.width, [UIApplication 
 #define kDarkThemeDetailViewBackgroundColor			[UIColor colorWithRed:0.3f green:0.3f blue:0.3f alpha:1.0f]
 #define kDarkThemeDetailViewBorderColor				[UIColor whiteColor]
 #define kDarkThemeHistoryTextColor					[UIColor whiteColor]
+#define kDarkThemeStatusBarBackgroundImageViewBackgroundColor [UIColor blackColor]
 
 ///////////////////////////////////////////////////////
 // Progress
@@ -487,6 +489,14 @@ kDetailViewWidth, kHistoryTableRowHeight*kMaxHistoryTableRowCount + kStatusBarHe
 - (void)addSubviewToBackgroundView:(UIView *)view atIndex:(NSInteger)index {
 	view.userInteractionEnabled = NO;
 	[self.backgroundView insertSubview:view atIndex:index];
+}
+
+- (MTStatusBarOverlayTheme)theme {
+    if (_theme == MTStatusBarOverlayThemeDefault) {
+        return ([UIApplication sharedApplication].statusBarStyle == UIStatusBarStyleDefault && !IsIPad && !IsIPhoneEmulationMode) ? MTStatusBarOverlayThemeLight : MTStatusBarOverlayThemeDark;
+    }
+    
+    return _theme;
 }
 
 
@@ -1086,10 +1096,10 @@ kDetailViewWidth, kHistoryTableRowHeight*kMaxHistoryTableRowCount + kStatusBarHe
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:cellID];
         
 		cell.textLabel.font = [UIFont boldSystemFontOfSize:10];
-		cell.textLabel.textColor = [UIApplication sharedApplication].statusBarStyle == UIStatusBarStyleDefault ? kLightThemeHistoryTextColor : kDarkThemeHistoryTextColor;
+		cell.textLabel.textColor = self.theme == MTStatusBarOverlayThemeLight ? kLightThemeHistoryTextColor : kDarkThemeHistoryTextColor;
         
 		cell.detailTextLabel.font = [UIFont boldSystemFontOfSize:12];
-		cell.detailTextLabel.textColor = [UIApplication sharedApplication].statusBarStyle == UIStatusBarStyleDefault ? kLightThemeHistoryTextColor : kDarkThemeHistoryTextColor;
+		cell.detailTextLabel.textColor = self.theme == MTStatusBarOverlayThemeLight ? kLightThemeHistoryTextColor : kDarkThemeHistoryTextColor;
 	}
     
 	// step 3: set up cell value
@@ -1179,26 +1189,26 @@ kDetailViewWidth, kHistoryTableRowHeight*kMaxHistoryTableRowCount + kStatusBarHe
 - (void)setStatusBarBackgroundForStyle:(UIStatusBarStyle)style {
 	// gray status bar?
 	// on iPad the Default Status Bar Style is black too
-	if (style == UIStatusBarStyleDefault && !IsIPad && !IsIPhoneEmulationMode) {
+	if (self.theme == MTStatusBarOverlayThemeLight) {
 		// choose image depending on size
 		if (self.shrinked) {
 			self.statusBarBackgroundImageView.image = [self.defaultStatusBarImageShrinked stretchableImageWithLeftCapWidth:2.0f topCapHeight:0.0f];
 		} else {
 			self.statusBarBackgroundImageView.image = [self.defaultStatusBarImage stretchableImageWithLeftCapWidth:2.0f topCapHeight:0.0f];
 		}
-		statusBarBackgroundImageView_.backgroundColor = [UIColor clearColor];
+        statusBarBackgroundImageView_.backgroundColor = kLightThemeStatusBarBackgroundImageViewBackgroundColor;
 	}
 	// black status bar? -> no image
 	else {
 		self.statusBarBackgroundImageView.image = nil;
-		statusBarBackgroundImageView_.backgroundColor = [UIColor blackColor];
+		statusBarBackgroundImageView_.backgroundColor = kDarkThemeStatusBarBackgroundImageViewBackgroundColor;
 	}
 }
 
 - (void)setColorSchemeForStatusBarStyle:(UIStatusBarStyle)style messageType:(MTMessageType)messageType {
 	// gray status bar?
 	// on iPad the Default Status Bar Style is black too
-	if (style == UIStatusBarStyleDefault && !IsIPad && !IsIPhoneEmulationMode) {
+	if (self.theme == MTStatusBarOverlayThemeLight) {
 		// set color of labels depending on messageType
         switch(messageType) {
             case MTMessageTypeFinish:
